@@ -62,4 +62,10 @@ public function appointments(): HasMany
 {
     return $this->hasMany(Appointment::class);
 }
+
+public function deals()
+{
+    return $this->hasMany(Deal::class);
+}
+
 }
