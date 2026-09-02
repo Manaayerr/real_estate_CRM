@@ -52,4 +52,14 @@ class User extends Authenticatable
 {
     return $this->hasMany(Lead::class, 'assigned_user_id');
 }
+
+public function activities(): HasMany
+{
+    return $this->hasMany(Activity::class);
+}
+
+public function appointments(): HasMany
+{
+    return $this->hasMany(Appointment::class);
+}
 }
