@@ -48,4 +48,9 @@ public function deals()
     return $this->hasMany(Deal::class);
 }
 
+public function customer()
+{
+    return $this->hasOne(Customer::class);
+}
+
 }
