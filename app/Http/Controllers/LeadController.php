@@ -10,10 +10,11 @@ class LeadController extends Controller
      * Display a listing of the resource.
      */
     public function index()
-    {
-        $leads = \App\Models\Lead::latest()->get();
-        return view('leads.index', compact('leads'));
-    }
+        {
+    $leads = \App\Models\Lead::with('assignedUser')->latest()->get();
+
+    return view('leads.index', compact('leads'));
+        }
 
     /**
      * Show the form for creating a new resource.

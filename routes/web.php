@@ -3,14 +3,35 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\LeadController;
 use Illuminate\Support\Facades\Route;
+use App\Models\Lead;
+use App\Models\Appointment;
+use App\Models\Deal;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
+
 Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+    $totalLeads = Lead::count();
+
+    $newLeads = Lead::where('status', 'new')->count();
+
+    $appointments = Appointment::count();
+
+    $deals = Deal::count();
+
+    $latestLeads = Lead::latest()->take(5)->get();
+
+    return view('dashboard', compact(
+        'totalLeads',
+        'newLeads',
+        'appointments',
+        'deals',
+        'latestLeads'
+    ));
+})->middleware(['auth'])->name('dashboard');
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
