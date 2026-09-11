@@ -23,12 +23,24 @@ Route::get('/dashboard', function () {
 
     $latestLeads = Lead::latest()->take(5)->get();
 
+
+    // ⭐ جديد: جلب أقرب 5 مواعيد قادمة
+    $upcomingAppointments = Appointment::with('lead')
+        ->where('appointment_date', '>=', now())
+        ->orderBy('appointment_date')
+        ->take(5)
+        ->get();
+
+
     return view('dashboard', compact(
         'totalLeads',
         'newLeads',
         'appointments',
         'deals',
-        'latestLeads'
+        'latestLeads',
+
+        // ⭐ جديد: إرسال المواعيد إلى صفحة Dashboard
+        'upcomingAppointments'
     ));
 })->middleware(['auth'])->name('dashboard');
 
@@ -38,9 +50,12 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+
 Route::get('/leads', [LeadController::class, 'index'])
     ->middleware('auth')
     ->name('leads.index');
+
 Route::get('/leads/create', [LeadController::class, 'create'])
     ->middleware('auth')
     ->name('leads.create');
@@ -64,5 +79,6 @@ Route::put('/leads/{lead}', [LeadController::class, 'update'])
 Route::delete('/leads/{lead}', [LeadController::class, 'destroy'])
     ->middleware('auth')
     ->name('leads.destroy');
+
 
 require __DIR__.'/auth.php';

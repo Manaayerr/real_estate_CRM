@@ -126,6 +126,78 @@
                             </tbody>
 
                         </table>
+
+                        <div class="mt-4">
+    <a
+        href="{{ route('leads.index') }}"
+        class="text-sm font-semibold text-indigo-600 hover:text-indigo-500 dark:text-indigo-400"
+    >
+        عرض جميع العملاء المحتملين →
+    </a>
+</div>
+                    </div>
+
+                </div>
+            </div>
+
+
+            <!-- ⭐ Upcoming Appointments -->
+            <div class="mt-6 bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900 dark:text-gray-100">
+
+                    <h3 class="text-lg font-semibold mb-4">
+                        المواعيد القادمة
+                    </h3>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-right">
+
+                            <thead>
+                                <tr class="border-b border-gray-200 dark:border-gray-700">
+                                    <th class="px-4 py-3">العميل</th>
+                                    <th class="px-4 py-3">نوع الموعد</th>
+                                    <th class="px-4 py-3">التاريخ</th>
+                                    <th class="px-4 py-3">الحالة</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                @forelse ($upcomingAppointments as $appointment)
+
+                                    <tr class="border-b border-gray-200 dark:border-gray-700">
+
+                                        <td class="px-4 py-3">
+                                            {{ $appointment->lead?->full_name ?? 'غير محدد' }}
+                                        </td>
+
+                                        <td class="px-4 py-3">
+                                            {{ $appointment->type }}
+                                        </td>
+
+                                        <td class="px-4 py-3">
+                                            {{ $appointment->appointment_date->format('Y-m-d H:i') }}
+                                        </td>
+
+                                        <td class="px-4 py-3">
+                                            {{ $appointment->status }}
+                                        </td>
+
+                                    </tr>
+
+                                @empty
+
+                                    <tr>
+                                        <td colspan="4" class="px-4 py-6 text-center">
+                                            لا توجد مواعيد قادمة.
+                                        </td>
+                                    </tr>
+
+                                @endforelse
+
+                            </tbody>
+
+                        </table>
                     </div>
 
                 </div>
