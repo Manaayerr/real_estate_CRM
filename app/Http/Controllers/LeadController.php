@@ -55,6 +55,18 @@ class LeadController extends Controller
      */
     public function show(\App\Models\Lead $lead)
 {
+    // ⭐ جلب العلاقات المرتبطة بالـ Lead
+    $lead->load([
+        'assignedUser',
+        'units.project',
+        'activities.user',
+        'appointments.unit',
+        'appointments.user',
+        'deals.unit',
+        'deals.user',
+        'customer',
+    ]);
+
     return view('leads.show', compact('lead'));
 }
 

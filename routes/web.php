@@ -13,6 +13,7 @@ Route::get('/', function () {
 
 
 Route::get('/dashboard', function () {
+
     $totalLeads = Lead::count();
 
     $newLeads = Lead::where('status', 'new')->count();
@@ -24,7 +25,14 @@ Route::get('/dashboard', function () {
     $latestLeads = Lead::latest()->take(5)->get();
 
 
-    // ⭐ جديد: جلب أقرب 5 مواعيد قادمة
+    // ⭐ إحصائيات حالات العملاء
+    $leadStatuses = Lead::select('status')
+        ->selectRaw('COUNT(*) as total')
+        ->groupBy('status')
+        ->get();
+
+
+    // ⭐ المواعيد القادمة
     $upcomingAppointments = Appointment::with('lead')
         ->where('appointment_date', '>=', now())
         ->orderBy('appointment_date')
@@ -33,22 +41,39 @@ Route::get('/dashboard', function () {
 
 
     return view('dashboard', compact(
+
         'totalLeads',
+
         'newLeads',
+
         'appointments',
+
         'deals',
+
         'latestLeads',
 
-        // ⭐ جديد: إرسال المواعيد إلى صفحة Dashboard
-        'upcomingAppointments'
+        // ⭐ إرسال المواعيد القادمة للـ Dashboard
+        'upcomingAppointments',
+
+        // ⭐ إرسال إحصائيات الحالات للـ Dashboard
+        'leadStatuses'
+
     ));
+
 })->middleware(['auth'])->name('dashboard');
 
 
 Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::get('/profile', [ProfileController::class, 'edit'])
+        ->name('profile.edit');
+
+    Route::patch('/profile', [ProfileController::class, 'update'])
+        ->name('profile.update');
+
+    Route::delete('/profile', [ProfileController::class, 'destroy'])
+        ->name('profile.destroy');
+
 });
 
 
@@ -56,25 +81,31 @@ Route::get('/leads', [LeadController::class, 'index'])
     ->middleware('auth')
     ->name('leads.index');
 
+
 Route::get('/leads/create', [LeadController::class, 'create'])
     ->middleware('auth')
     ->name('leads.create');
+
 
 Route::post('/leads', [LeadController::class, 'store'])
     ->middleware('auth')
     ->name('leads.store');
 
+
 Route::get('/leads/{lead}', [LeadController::class, 'show'])
     ->middleware('auth')
     ->name('leads.show');
+
 
 Route::get('/leads/{lead}/edit', [LeadController::class, 'edit'])
     ->middleware('auth')
     ->name('leads.edit');
 
+
 Route::put('/leads/{lead}', [LeadController::class, 'update'])
     ->middleware('auth')
     ->name('leads.update');
+
 
 Route::delete('/leads/{lead}', [LeadController::class, 'destroy'])
     ->middleware('auth')
