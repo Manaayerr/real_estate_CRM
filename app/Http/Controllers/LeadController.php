@@ -9,12 +9,62 @@ class LeadController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
-        {
-    $leads = \App\Models\Lead::with('assignedUser')->latest()->get();
+    public function index(\Illuminate\Http\Request $request)
+{
+    $search = $request->input('search');
+    $status = $request->input('status');
+    $source = $request->input('source');
+    $assignedUser = $request->input('assigned_user_id');
 
-    return view('leads.index', compact('leads'));
-        }
+    $leads = \App\Models\Lead::with('assignedUser')
+        ->when($search, function ($query, $search) {
+            $query->where(function ($query) use ($search) {
+                $query->where('full_name', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            });
+        })
+        ->when($status, function ($query, $status) {
+            $query->where('status', $status);
+        })
+        ->when($source, function ($query, $source) {
+            $query->where('source', $source);
+        })
+        ->when($assignedUser, function ($query, $assignedUser) {
+            $query->where('assigned_user_id', $assignedUser);
+        })
+        ->latest()
+        ->paginate(10)
+        ->withQueryString();
+
+    $statuses = \App\Models\Lead::query()
+        ->whereNotNull('status')
+        ->distinct()
+        ->orderBy('status')
+        ->pluck('status');
+
+    $sources = \App\Models\Lead::query()
+        ->whereNotNull('source')
+        ->distinct()
+        ->orderBy('source')
+        ->pluck('source');
+
+    $users = \App\Models\User::query()
+        ->where('is_active', true)
+        ->orderBy('name')
+        ->get();
+
+    return view('leads.index', compact(
+        'leads',
+        'statuses',
+        'sources',
+        'users',
+        'search',
+        'status',
+        'source',
+        'assignedUser'
+    ));
+}
 
     /**
      * Show the form for creating a new resource.
